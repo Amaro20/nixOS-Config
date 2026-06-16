@@ -10,7 +10,7 @@
   networking.hostName = "amaroNix";
   networking.networkmanager.enable = true;
 
-  time.timeZone = "Africa/Cairo";
+  time.timeZone = ""; #timeZone here
 
   services.desktopManager.plasma6.enable = true;
   services.power-profiles-daemon.enable = true;
