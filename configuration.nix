@@ -7,9 +7,10 @@
 
   nixpkgs.config.allowUnfree = true;
 
+  networking.hostName = "nixos";
   networking.networkmanager.enable = true;
 
-  time.timeZone = "";
+  time.timeZone = "UTC"; # Change to your preferred timezone
 
   services.desktopManager.plasma6.enable = true;
   services.power-profiles-daemon.enable = true;
@@ -17,20 +18,13 @@
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
-
-    # Put wallpaper here:
-    # assets/wallpaper.png
-    theme = "${pkgs.runCommand "breeze-sddm-custom" {} ''
-      mkdir -p $out/share/sddm/themes/breeze
-
-      cp -r ${pkgs.kdePackages.sddm-kcm}/share/sddm/themes/breeze/. \
-        $out/share/sddm/themes/breeze/
-
-      cat > $out/share/sddm/themes/breeze/theme.conf.user <<EOF
-[General]
-background=${./assets/wallpaper.png}
-EOF
-    ''}/share/sddm/themes/breeze";
+    theme = "breeze";
+    settings = {
+      Theme = {
+        CursorTheme = "breeze_cursors";
+        Background = "${./assets/wallpaper.png}";
+      };
+    };
   };
 
   zramSwap = {
@@ -57,7 +51,7 @@ EOF
 
   security.sudo.wheelNeedsPassword = true;
 
-  users.users.amaro = {
+  users.users.yourusername = {
     isNormalUser = true;
     extraGroups = [
       "wheel"
@@ -68,10 +62,8 @@ EOF
   };
 
   programs.firefox.enable = true;
-
   programs.steam.enable = true;
   programs.gamemode.enable = true;
-
   programs.steam.gamescopeSession.enable = true;
 
   programs.gamescope = {
@@ -137,7 +129,6 @@ EOF
   boot.loader.grub.enable = true;
   boot.loader.grub.efiSupport = true;
   boot.loader.efi.canTouchEfiVariables = true;
-
   boot.loader.grub.device = "nodev";
   boot.loader.grub.configurationLimit = 2;
 
