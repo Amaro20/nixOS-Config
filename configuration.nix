@@ -10,7 +10,7 @@
   networking.hostName = "amaroNix";
   networking.networkmanager.enable = true;
 
-  time.timeZone = ""; # Timezone here
+  time.timeZone = ""; # Timezone
 
   services.desktopManager.plasma6.enable = true;
   services.power-profiles-daemon.enable = true;
@@ -18,13 +18,12 @@
     enable = true;
     wayland.enable = true;
     theme = "breeze";
-    settings = {
-      Theme = {
-        # Replace the path below with the absolute path to your wallpaper image
-        Background = "";
-      };
-    };
   };
+
+  environment.etc."sddm.conf.d/breeze-custom.conf".text = ''
+    [Theme]
+    Background="" # SDDM wallpaper path
+  '';
 
   zramSwap = {
    enable = true;
