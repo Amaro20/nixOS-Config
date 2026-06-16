@@ -5,17 +5,13 @@
     ./hardware-configuration.nix
   ];
 
-  # Allow proprietary packages
   nixpkgs.config.allowUnfree = true;
 
-  # Network
   networking.hostName = "amaroNix";
   networking.networkmanager.enable = true;
 
-  # Timezone
   time.timeZone = "";
 
-  # KDE Plasma + SDDM
   services.desktopManager.plasma6.enable = true;
 
   services.power-profiles-daemon.enable = true;
@@ -24,13 +20,12 @@
     enable = true;
     wayland.enable = true;
 
-    # Put your wallpaper here:
+    # Put your wallpaper at:
     # assets/wallpaper.png
-
     theme = "${pkgs.runCommand "breeze-sddm-custom" {} ''
       mkdir -p $out/share/sddm/themes/breeze
 
-      cp -r ${pkgs.kdePackages.sddm-kcm}/share/sddm/themes/breeze/* \
+      cp -r ${pkgs.kdePackages.breeze}/share/sddm/themes/breeze/* \
         $out/share/sddm/themes/breeze/
 
       cat > $out/share/sddm/themes/breeze/theme.conf.user <<EOF
@@ -40,17 +35,15 @@ EOF
     ''}/share/sddm/themes/breeze";
   };
 
-  # ZRAM
   zramSwap = {
     enable = true;
     memoryPercent = 50;
   };
 
-  # Services
   services.flatpak.enable = true;
+
   services.thermald.enable = true;
 
-  # Audio
   services.pipewire = {
     enable = true;
     pulse.enable = true;
@@ -64,7 +57,8 @@ EOF
     };
   };
 
-  # User
+  security.sudo.wheelNeedsPassword = true;
+
   users.users.amaro = {
     isNormalUser = true;
     extraGroups = [
@@ -75,7 +69,6 @@ EOF
     ];
   };
 
-  # Programs
   programs.firefox.enable = true;
 
   programs.steam.enable = true;
@@ -88,23 +81,19 @@ EOF
     capSysNice = true;
   };
 
-  # Bluetooth
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
 
-  # Graphics
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
 
     extraPackages = with pkgs; [
-      mesa
+      intel-media-driver
+      intel-vaapi-driver
       libva-vdpau-driver
       libvdpau-va-gl
-
-      # Intel + AMD hybrid only:
-      # intel-media-driver
-      # intel-vaapi-driver
+      mesa
     ];
   };
 
@@ -112,7 +101,6 @@ EOF
 
   hardware.enableRedistributableFirmware = true;
 
-  # Packages
   environment.systemPackages = with pkgs; [
     git
     wget
@@ -138,11 +126,9 @@ EOF
     discord
   ];
 
-  # Qt
   qt.enable = true;
   qt.platformTheme = "kde";
 
-  # Kitty config
   environment.etc."xdg/kitty/kitty.conf".text = ''
     cursor_shape block
     cursor_blink_interval 0
@@ -150,16 +136,13 @@ EOF
     cursor_trail_decay 0.1 0.4
   '';
 
-  # Bootloader
   boot.loader.grub.enable = true;
   boot.loader.grub.efiSupport = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.grub.device = "nodev";
 
-  # Keep 2 generations
+  boot.loader.grub.device = "nodev";
   boot.loader.grub.configurationLimit = 2;
 
-  # RAM
   boot.kernel.sysctl = {
     "vm.swappiness" = 100;
   };
