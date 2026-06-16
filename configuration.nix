@@ -13,9 +13,18 @@
   time.timeZone = "Africa/Cairo";
 
   services.desktopManager.plasma6.enable = true;
-  services.displayManager.sddm.enable = true;
-  services.displayManager.sddm.wayland.enable = true;
   services.power-profiles-daemon.enable = true;
+  services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = true;
+    theme = "breeze";
+    settings = {
+      Theme = {
+        # Replace the path below with the absolute path to your wallpaper image
+        Background = "";
+      };
+    };
+  };
 
   zramSwap = {
    enable = true;
@@ -100,12 +109,10 @@
   qt.enable = true;
   qt.platformTheme = "kde";
 
-  environment.etc."xdg/kitty/kitty.conf".text = ''
-  # Cursor shape settings
+ environment.etc."xdg/kitty/kitty.conf".text = ''
+  # Correct Plasma 6 Kitty syntax
   cursor_shape block
   cursor_blink_interval 0
-
-  # Cursor trail effect
   cursor_trail 1
   cursor_trail_decay 0.1 0.4
 '';
