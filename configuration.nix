@@ -78,7 +78,24 @@ in
 
   programs.firefox.enable = true;
   programs.steam.enable = true;
-  programs.gamemode.enable = true;
+
+  programs.gamemode = {
+    enable = true;
+    enableRenice = true; # Keeps high CPU priority for smooth frame pacing
+    settings = {
+      general = {
+        # Prevents GameMode from fighting with power-profiles-daemon over governor naming
+        desiredgov = "none";
+      };
+      gpu = {
+        apply_gpu_optimisations = "accept-responsibility";
+        gpu_vendor = "amd";
+        # Tells your AMD GPU to dynamically scale clocks instead of forcing max speed
+        amd_performance_level = "auto";
+      };
+    };
+  };
+
   programs.steam.gamescopeSession.enable = true;
   programs.gamescope = {
     enable = true;
