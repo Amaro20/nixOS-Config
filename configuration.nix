@@ -7,25 +7,23 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  networking.hostName = "amaroNix";
   networking.networkmanager.enable = true;
 
   time.timeZone = "";
 
   services.desktopManager.plasma6.enable = true;
-
   services.power-profiles-daemon.enable = true;
 
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
 
-    # Put your wallpaper at:
+    # Put wallpaper here:
     # assets/wallpaper.png
     theme = "${pkgs.runCommand "breeze-sddm-custom" {} ''
       mkdir -p $out/share/sddm/themes/breeze
 
-      cp -r ${pkgs.kdePackages.breeze}/share/sddm/themes/breeze/* \
+      cp -r ${pkgs.kdePackages.sddm-kcm}/share/sddm/themes/breeze/. \
         $out/share/sddm/themes/breeze/
 
       cat > $out/share/sddm/themes/breeze/theme.conf.user <<EOF
