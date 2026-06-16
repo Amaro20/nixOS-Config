@@ -5,33 +5,52 @@
     ./hardware-configuration.nix
   ];
 
+  # Allow proprietary packages
   nixpkgs.config.allowUnfree = true;
 
+  # Network
   networking.hostName = "amaroNix";
   networking.networkmanager.enable = true;
 
-  time.timeZone = ""; # Timezone
+  # Timezone
+  time.timeZone = "";
 
+  # KDE Plasma + SDDM
   services.desktopManager.plasma6.enable = true;
+
   services.power-profiles-daemon.enable = true;
+
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
-    theme = "breeze";
+
+    # Put your wallpaper here:
+    # assets/wallpaper.png
+
+    theme = "${pkgs.runCommand "breeze-sddm-custom" {} ''
+      mkdir -p $out/share/sddm/themes/breeze
+
+      cp -r ${pkgs.kdePackages.sddm-kcm}/share/sddm/themes/breeze/* \
+        $out/share/sddm/themes/breeze/
+
+      cat > $out/share/sddm/themes/breeze/theme.conf.user <<EOF
+[General]
+background=${./assets/wallpaper.png}
+EOF
+    ''}/share/sddm/themes/breeze";
   };
 
-  environment.etc."sddm.conf.d/breeze-custom.conf".text = ''
-    [Theme]
-    Background="" # SDDM wallpaper path
-  '';
-
+  # ZRAM
   zramSwap = {
-   enable = true;
-   memoryPercent = 50;
+    enable = true;
+    memoryPercent = 50;
   };
 
+  # Services
   services.flatpak.enable = true;
   services.thermald.enable = true;
+
+  # Audio
   services.pipewire = {
     enable = true;
     pulse.enable = true;
@@ -40,20 +59,28 @@
   };
 
   services.pipewire.extraConfig.pipewire."99-low-power" = {
-  "context.properties" = {
-    "resample.quality" = 2;
+    "context.properties" = {
+      "resample.quality" = 2;
     };
   };
-  security.sudo.wheelNeedsPassword = true;
 
+  # User
   users.users.amaro = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" "video" "render" ];
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+      "video"
+      "render"
+    ];
   };
 
+  # Programs
   programs.firefox.enable = true;
+
   programs.steam.enable = true;
   programs.gamemode.enable = true;
+
   programs.steam.gamescopeSession.enable = true;
 
   programs.gamescope = {
@@ -61,26 +88,31 @@
     capSysNice = true;
   };
 
+  # Bluetooth
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
 
- hardware.graphics = {
+  # Graphics
+  hardware.graphics = {
     enable = true;
     enable32Bit = true;
+
     extraPackages = with pkgs; [
-      intel-media-driver
-      intel-vaapi-driver
+      mesa
       libva-vdpau-driver
       libvdpau-va-gl
-      mesa
+
+      # Intel + AMD hybrid only:
+      # intel-media-driver
+      # intel-vaapi-driver
     ];
   };
 
-  # Loads AMD drivers at earliest boot phase
   hardware.amdgpu.initrd.enable = true;
 
   hardware.enableRedistributableFirmware = true;
 
+  # Packages
   environment.systemPackages = with pkgs; [
     git
     wget
@@ -88,6 +120,7 @@
     tree
     unzip
     p7zip
+
     kitty
 
     kdePackages.kate
@@ -105,24 +138,31 @@
     discord
   ];
 
+  # Qt
   qt.enable = true;
   qt.platformTheme = "kde";
 
- environment.etc."xdg/kitty/kitty.conf".text = ''
-  # Correct Plasma 6 Kitty syntax
-  cursor_shape block
-  cursor_blink_interval 0
-  cursor_trail 1
-  cursor_trail_decay 0.1 0.4
-'';
+  # Kitty config
+  environment.etc."xdg/kitty/kitty.conf".text = ''
+    cursor_shape block
+    cursor_blink_interval 0
+    cursor_trail 1
+    cursor_trail_decay 0.1 0.4
+  '';
 
+  # Bootloader
   boot.loader.grub.enable = true;
   boot.loader.grub.efiSupport = true;
   boot.loader.efi.canTouchEfiVariables = true;
-
   boot.loader.grub.device = "nodev";
+
+  # Keep 2 generations
   boot.loader.grub.configurationLimit = 2;
-  boot.kernel.sysctl = { "vm.swappiness" = 100; };
+
+  # RAM
+  boot.kernel.sysctl = {
+    "vm.swappiness" = 100;
+  };
 
   system.stateVersion = "26.05";
 }
