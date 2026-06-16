@@ -10,7 +10,7 @@
   networking.hostName = "amaroNix";
   networking.networkmanager.enable = true;
 
-  time.timeZone = ""; #timeZone here
+  time.timeZone = ""; # Timezone here
 
   services.desktopManager.plasma6.enable = true;
   services.power-profiles-daemon.enable = true;
@@ -49,7 +49,7 @@
 
   users.users.amaro = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" "video" "render"];
+    extraGroups = [ "wheel" "networkmanager" "video" "render" ];
   };
 
   programs.firefox.enable = true;
