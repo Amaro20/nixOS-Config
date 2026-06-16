@@ -65,7 +65,6 @@
       libva-vdpau-driver
       libvdpau-va-gl
       mesa
-      vulkan-radeon
     ];
   };
 
