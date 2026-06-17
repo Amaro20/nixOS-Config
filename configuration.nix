@@ -173,6 +173,7 @@ in
     kdePackages.qtstyleplugin-kvantum
     kdePackages.plasma-systemmonitor
     kdePackages.sddm-kcm
+    sddmTheme
     vulkan-tools
     mangohud
     pavucontrol
