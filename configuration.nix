@@ -1,13 +1,11 @@
 # NixOS configuration — Plasma 6 desktop with gaming setup
 # (Intel CPU + AMD GPU, 8GB RAM, zram swap)
 #
-# Before using:
-#   1. Replace `myHostname` and `myUser` below with your own values.
-#   2. Place a wallpaper image at ./assets/background.png (or update the
-#      path in `sddmTheme` below) — this image is not included in this repo.
-#   3. Run `nixos-generate-config` on your own machine to get a matching
-#      hardware-configuration.nix; the one referenced here is machine-specific
-#      and is NOT included in this repo.
+# NOTE: replace placeholders before use:
+#   - networking.hostName
+#   - users.users.<username>
+#   - time.timeZone
+#   - ./assets/<your-wallpaper>.png
 
 { config, lib, pkgs, ... }:
 
@@ -19,7 +17,7 @@ let
       mkdir -p $out/share/sddm/themes/breeze-custom
       cp -r ${pkgs.kdePackages.plasma-desktop}/share/sddm/themes/breeze/. \
         $out/share/sddm/themes/breeze-custom/
-      cp ${./assets/background.png} \
+      cp ${./assets/wallpaper.png} \
         $out/share/sddm/themes/breeze-custom/background.png
       sed -i 's|^background=.*|background=background.png|' \
         $out/share/sddm/themes/breeze-custom/theme.conf || \
@@ -35,9 +33,9 @@ in
   ];
 
   nixpkgs.config.allowUnfree = true;
-  networking.hostName = "myHostname";
+  networking.hostName = "nixos-desktop"; # CHANGE ME
   networking.networkmanager.enable = true;
-  time.timeZone = "Africa/Cairo";
+  time.timeZone = "Etc/UTC"; # CHANGE ME to your timezone
 
   services.desktopManager.plasma6.enable = true;
   services.power-profiles-daemon.enable = true;
@@ -67,9 +65,7 @@ in
     algorithm = "zstd";
   };
 
-  # Disabled: not needed unless you actually use Flatpak apps
-  # (everything in this config is installed via nixpkgs).
-  # services.flatpak.enable = true;
+  services.flatpak.enable = true;
   services.thermald.enable = true;
 
   # NOTE on Baloo (KDE's file indexer): there's no NixOS module option
@@ -92,7 +88,7 @@ in
 
   security.sudo.wheelNeedsPassword = true;
 
-  users.users.myUser = {
+  users.users.youruser = { # CHANGE ME
     isNormalUser = true;
     extraGroups = [
       "wheel"
@@ -179,10 +175,8 @@ in
     pavucontrol
     fastfetch
     prismlauncher
-    discord
-    # Lighter alternative worth trying: swap "discord" above for "vesktop"
-    # (pkgs.vesktop) — same functionality, noticeably less background
-    # overhead on Electron's process model. Confirmed available in nixpkgs.
+    vesktop
+    localsend
   ];
 
   qt.enable = true;
