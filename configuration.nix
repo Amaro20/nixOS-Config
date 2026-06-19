@@ -37,6 +37,10 @@ in
   networking.networkmanager.enable = true;
   time.timeZone = "Etc/UTC"; # CHANGE ME to your timezone
 
+  # Ports needed for localsend
+  networking.firewall.allowedTCPPorts = [ 53317 ];
+  networking.firewall.allowedUDPPorts = [ 53317 ];
+
   services.desktopManager.plasma6.enable = true;
   services.power-profiles-daemon.enable = true;
   services.fstrim.enable = true;
