@@ -1,11 +1,11 @@
 # NixOS configuration — Plasma 6 desktop with gaming setup
 # (Intel CPU + AMD GPU, 8GB RAM, zram swap)
 #
-# NOTE: replace placeholders before use:
-#   - networking.hostName
-#   - users.users.<username>
-#   - time.timeZone
-#   - ./assets/<your-wallpaper>.png
+# Tuned for low-power hardware (e.g. dual-core Intel laptop CPU with no
+# Turbo Boost + an older/low-end AMD dGPU). Goal: balanced performance
+# without overheating, particularly for lighter 2D games (e.g. tModLoader).
+#
+# >>> Before using this, replace the placeholders marked CHANGE-ME <<<
 
 { config, lib, pkgs, ... }:
 
@@ -33,11 +33,15 @@ in
   ];
 
   nixpkgs.config.allowUnfree = true;
-  networking.hostName = "nixos-desktop"; # CHANGE ME
-  networking.networkmanager.enable = true;
-  time.timeZone = "Etc/UTC"; # CHANGE ME to your timezone
 
-  # Ports needed for localsend
+  # CHANGE-ME: pick your own hostname
+  networking.hostName = "nixos";
+  networking.networkmanager.enable = true;
+
+  # CHANGE-ME: set to your own timezone, e.g. "America/New_York"
+  time.timeZone = "UTC";
+
+  # Port used by LocalSend (file sharing app). Remove if unused.
   networking.firewall.allowedTCPPorts = [ 53317 ];
   networking.firewall.allowedUDPPorts = [ 53317 ];
 
@@ -45,6 +49,7 @@ in
   services.power-profiles-daemon.enable = true;
   services.fstrim.enable = true;
   services.fwupd.enable = true;
+  services.journald.extraConfig = "SystemMaxUse=200M";
 
   services.displayManager.sddm = {
     enable = true;
@@ -60,13 +65,12 @@ in
 
   # zram swap tuned for 8GB systems: keep swap fast (RAM-backed, compressed)
   # so high swappiness doesn't cause disk-style thrashing.
-  # memoryPercent bumped 50 -> 60 for more headroom on a tight 8GB system.
-  # zstd compresses better than the default lz4 (slightly more CPU cost,
-  # worth it on a RAM-constrained dual-core machine).
+  # lz4 chosen over zstd: cheaper to (de)compress, better fit for a
+  # low-core-count CPU with no Turbo Boost headroom to spare.
   zramSwap = {
     enable = true;
     memoryPercent = 60;
-    algorithm = "zstd";
+    algorithm = "lz4";
   };
 
   services.flatpak.enable = true;
@@ -76,7 +80,7 @@ in
   # to disable it system-wide — it's a per-user Plasma setting. Disable
   # it with `balooctl6 disable` (or via System Settings > Search >
   # File Search) after rebuilding. It's a known background RAM/CPU
-  # hog and worth turning off on this hardware.
+  # hog and worth turning off on lower-end hardware.
 
   services.pipewire = {
     enable = true;
@@ -92,7 +96,8 @@ in
 
   security.sudo.wheelNeedsPassword = true;
 
-  users.users.youruser = { # CHANGE ME
+  # CHANGE-ME: replace with your own username
+  users.users."CHANGE-ME" = {
     isNormalUser = true;
     extraGroups = [
       "wheel"
@@ -112,16 +117,17 @@ in
 
   programs.gamemode = {
     enable = true;
-    enableRenice = true; # Keeps high CPU priority for smooth frame pacing
+    enableRenice = true;
     settings = {
       general = {
-        # Prevents GameMode from fighting with power-profiles-daemon over governor naming
+        # Prevents GameMode from fighting power-profiles-daemon over
+        # governor control.
         desiredgov = "none";
+        renice = 10;
       };
       gpu = {
         apply_gpu_optimisations = "accept-responsibility";
         gpu_vendor = "amd";
-        # Tells your AMD GPU to dynamically scale clocks instead of forcing max speed
         amd_performance_level = "auto";
       };
     };
@@ -146,19 +152,27 @@ in
       libva-vdpau-driver
       libvdpau-va-gl
       mesa
+      vulkan-loader
+      vulkan-validation-layers
+    ];
+    extraPackages32 = with pkgs.pkgsi686Linux; [
+      mesa
+      vulkan-loader
     ];
   };
 
+  hardware.cpu.intel.updateMicrocode = true;
   hardware.amdgpu.initrd.enable = true;
   hardware.enableRedistributableFirmware = true;
 
-  # Hybrid graphics note: you have both an Intel iGPU and AMD dGPU.
-  # This config already uses Mesa RADV (not AMDVLK) for the AMD GPU,
-  # which is the lighter/recommended driver — no change needed there.
-  # To keep idle/desktop work on the lighter Intel iGPU and reserve the
-  # AMD dGPU for games, launch demanding apps with:
+  # Hybrid graphics note: if you have both an Intel iGPU and AMD dGPU,
+  # Mesa RADV (default here, not AMDVLK) is the lighter/recommended driver.
+  # To keep idle/desktop work on the lighter iGPU and reserve the dGPU
+  # for demanding games, launch with:
   #   DRI_PRIME=1 %command%
   # as a per-game Steam launch option, or `DRI_PRIME=1 <app>` from a terminal.
+  # Conversely, for lightweight 2D games, DRI_PRIME=0 keeps the dGPU
+  # asleep entirely.
 
   environment.systemPackages = with pkgs; [
     git
@@ -190,7 +204,7 @@ in
     enable = true;
     extraPortals = [
       pkgs.xdg-desktop-portal-gtk
-      pkgs.kdePackages.xdg-desktop-portal-kde # Add this for Plasma 6 compatibility
+      pkgs.kdePackages.xdg-desktop-portal-kde
     ];
     config.common.default = "*";
   };
@@ -207,15 +221,21 @@ in
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.grub.device = "nodev";
   boot.loader.grub.configurationLimit = 2;
+  boot.tmp.cleanOnBoot = true;
 
   # High swappiness is intentional here: swap is zram (RAM-backed, compressed),
   # not disk, so aggressive swapping doesn't cause the usual disk-thrashing
   # slowdown. This is a common tuning choice for 8GB systems.
+  #
+  # vfs_cache_pressure lowered from default (100) to keep filesystem
+  # metadata caches around longer, reducing repeat disk I/O for apps/games
+  # that touch many small files (e.g. mod assets).
   boot.kernel.sysctl = {
-    "vm.swappiness" = 100;
+    "vm.swappiness" = 60;
+    "vm.vfs_cache_pressure" = 50;
   };
 
-  # NOTE: stateVersion should match the NixOS release you FIRST installed
-  # with — do not bump this when you upgrade channels.
+  # CHANGE-ME: stateVersion should match the NixOS release you FIRST
+  # installed with — do not bump this when you upgrade channels.
   system.stateVersion = "26.05";
 }
