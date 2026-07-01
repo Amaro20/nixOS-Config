@@ -19,4 +19,4 @@ sudo nixos-rebuild switch --upgrade
 ```
 
 ## License
-MIT (or whatever you prefer)
+MIT
