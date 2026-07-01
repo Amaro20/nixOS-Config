@@ -15,7 +15,7 @@ low-power, gaming-capable 8GB machine (Intel iGPU + AMD dGPU hybrid graphics).
 
 ```bash
 sudo cp configuration.nix /etc/nixos/configuration.nix
-sudo nixos-rebuild switch
+sudo nixos-rebuild switch --upgrade
 ```
 
 ## License
