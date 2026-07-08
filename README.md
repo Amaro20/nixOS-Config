@@ -30,6 +30,8 @@ PS1='\u@\h:\w\$ '
 # Run system information fetch tool on startup
 fastfetch
 
+```
+
 ## Kitty Configuration
 
 ```conf
@@ -73,4 +75,7 @@ cursor_trail_decay 0.1 0.4
 ```
 
 ## License
+
+```bash
 MIT License
+```
