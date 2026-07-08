@@ -39,16 +39,20 @@ fastfetch
 # Kitty Terminal Config
 # -------------------------------
 
+# Display server protocol
 linux_display_server wayland
 
+# Transparency and blur settings
 background_opacity 0.30
 dynamic_background_opacity yes
 background_blur 1
 hide_window_decorations yes
 
+# Color scheme
 background #0a192f
 foreground #00BFFF
 
+# Font settings
 font_family Hack
 bold_font auto
 italic_font auto
@@ -56,16 +60,20 @@ bold_italic_font auto
 font_size 12.0
 enable_ligatures yes
 
-window_padding_width 12
+# Window layout and dimensions (Updated for a larger window on startup)
 remember_window_size no
-initial_window_width 1152
-initial_window_height 600
+initial_window_width  1400
+initial_window_height 800
+window_padding_width 12
 
+# Performance options
 repaint_delay 10
 sync_to_monitor yes
 
+# Terminal scrollback history
 scrollback_lines 10000
 
+# Cursor behavior and custom trail effects
 shell_integration no-cursor
 cursor_shape block
 cursor_blinking off
