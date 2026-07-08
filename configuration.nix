@@ -248,6 +248,7 @@ in
     unzip
     p7zip
     fastfetch
+    ncdu
 
     # Terminal
     kitty
