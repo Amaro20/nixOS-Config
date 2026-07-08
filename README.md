@@ -18,5 +18,17 @@ sudo cp configuration.nix /etc/nixos/configuration.nix
 sudo nixos-rebuild switch --upgrade
 ```
 
+## Bash Configuration
+
+```bash
+# Initialize the Starship cross-shell prompt
+eval "$(starship init bash)"
+
+# Set the default backup prompt format
+PS1='\u@\h:\w\$ '
+
+# Run system information fetch tool on startup
+fastfetch
+
 ## License
 MIT License
