@@ -189,7 +189,7 @@ in
   # AMD GPU, which is the lighter/recommended driver. To keep idle/desktop
   # work on the lighter Intel iGPU and reserve the AMD dGPU for games,
   # launch demanding apps with:
-  #   DRI_PRIME=1 %command%
+  #    DRI_PRIME=1 %command%
   # as a per-game Steam launch option, or `DRI_PRIME=1 <app>` from a terminal.
 
   # ---------------------------------------------------------------------
@@ -271,6 +271,7 @@ in
     # Apps
     localsend
     discordWrapped
+    obsidian
   ];
 
   environment.etc."xdg/kitty/kitty.conf".text = ''
