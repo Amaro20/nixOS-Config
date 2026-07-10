@@ -54,6 +54,8 @@ in
 
   networking.hostName = "<your-hostname>";
   networking.networkmanager.enable = true;
+  networking.nameservers = [ "1.1.1.1" "1.0.0.1" ];
+  networking.networkmanager.dns = "none";
 
   # LocalSend (LAN file transfer) — adjust/remove if unused
   networking.firewall.allowedTCPPorts = [ 53317 ];
